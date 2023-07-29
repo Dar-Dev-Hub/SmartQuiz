@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ quiz.title }}</title>
+</head>
+<body>
+    <h1>{{ quiz.title }}</h1>
+    <p>{{ quiz.description }}</p>
+
+    <form method="post" action="{% url 'submit_quiz' quiz_id=quiz.id %}">
+        {% csrf_token %}
+        {% for question in questions %}
+        <fieldset>
+            <legend>{{ question.content }}</legend>
+            {% for choice in question.choice_set.all %}
+            <label>
+                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
+                {{ choice.content }}
+            </label><br>
+            {% endfor %}
+        </fieldset>
+        {% endfor %}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
