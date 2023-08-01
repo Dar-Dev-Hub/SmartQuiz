@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,8 +30,20 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_TIMEOUT': timedelta(days=3),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 # Application definition
 
@@ -42,6 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Quiz.apps.QuizConfig',
     'rest_framework',
+    'drf_yasg',
+
+
 
 ]
 
@@ -56,11 +73,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'AIQuiz.urls'
-import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'Quiz/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'Quiz/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,7 +133,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-import os
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
