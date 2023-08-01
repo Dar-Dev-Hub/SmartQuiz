@@ -1,39 +1,22 @@
-"""
-URL configuration for AIQuiz project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path,include
-from Quiz import views
+from django.urls import path, include
+from Quiz import views 
 from rest_framework import routers
+
+
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'quiz', views.QuizViewSet)
-router.register(r'question', views.QuestionViewSet)
-router.register(r'choice', views.ChoiceViewSet)
-router.register(r'category', views.CategoryViewSet)
-router.register(r'profile', views.UserProfileViewSet)
-urlpatterns = [
-    path('', include(router.urls)),
+router.register(r'questions', views.QuestionViewSet)
+router.register(r'choices', views.ChoiceViewSet)
+router.register(r'question_submissions', views.QuestionSubmissionViewSet)
+router.register(r'quiz_submissions', views.QuizSubmissionViewSet)
 
-    path('admin/', admin.site.urls),
-    # path('quiz/<int:quiz_id>/', views.quiz_detail, name='quiz_detail'),
-    # path('quiz/<int:quiz_id>/submit/', views.submit_quiz, name='submit_quiz'),
-    # path('quiz/<int:quiz_id>/results/', views.quiz_results, name='quiz_results'),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+urlpatterns = [
+    path('', include(router.urls)),  # API root
+    path('admin/', admin.site.urls), # admin page
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')) # API authentication
 
 ]
