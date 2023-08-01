@@ -1,27 +1,28 @@
 from rest_framework import serializers
-from Quiz.models import Quiz, Question, Choice,Category,UserProfile
-
-class QuizSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Quiz
-        fields = ['id', 'title','description']
-
-class QuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Question
-        fields = ['id', 'quiz', 'content', 'score', 'category', 'score']
+from Quiz.models import QuizSubmission, QuestionSubmission, Question, Choice
 
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ['id', 'question', 'content', 'is_correct']
+        fields = '__all__'
 
-class CategorySerializer(serializers.ModelSerializer):
-    class   Meta:
-        model = Category
-        fields = ['id', 'name', 'description']
+class QuestionSerializer(serializers.ModelSerializer):
+    choices = ChoiceSerializer(many=True, read_only=True)
 
-class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfile
-        fields = ['id', 'user', 'score']
+        model = Question
+        fields = '__all__'
+
+class QuestionSubmissionSerializer(serializers.ModelSerializer):
+    question = QuestionSerializer()
+
+    class Meta:
+        model = QuestionSubmission
+        fields = '__all__'
+
+class QuizSubmissionSerializer(serializers.ModelSerializer):
+    questionsubmission_set = QuestionSubmissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = QuizSubmission
+        fields = '__all__'
