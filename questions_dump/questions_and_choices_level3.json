@@ -1,0 +1,137 @@
+[
+    {
+        "content": "What is the value of π (pi) rounded to two decimal places?",
+        "level": 3,
+        "choices": [
+            {"content": "3.14", "is_correct": true},
+            {"content": "2.71", "is_correct": false},
+            {"content": "1.62", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which planet is known as the 'Red Planet'?",
+        "level": 3,
+        "choices": [
+            {"content": "Venus", "is_correct": false},
+            {"content": "Mars", "is_correct": true},
+            {"content": "Jupiter", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Who wrote the famous novel 'Pride and Prejudice'?",
+        "level": 3,
+        "choices": [
+            {"content": "Jane Austen", "is_correct": true},
+            {"content": "George Orwell", "is_correct": false},
+            {"content": "Emily Brontë", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which country is known as the 'Land of the Rising Sun'?",
+        "level": 3,
+        "choices": [
+            {"content": "China", "is_correct": false},
+            {"content": "Japan", "is_correct": true},
+            {"content": "India", "is_correct": false}
+        ]
+    },
+    {
+        "content": "What is the chemical symbol for sodium?",
+        "level": 3,
+        "choices": [
+            {"content": "Na", "is_correct": true},
+            {"content": "Ca", "is_correct": false},
+            {"content": "K", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Who is the author of the famous novel 'To Kill a Mockingbird'?",
+        "level": 3,
+        "choices": [
+            {"content": "Charles Dickens", "is_correct": false},
+            {"content": "Harper Lee", "is_correct": true},
+            {"content": "Mark Twain", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which gas is most abundant in Earth's atmosphere?",
+        "level": 3,
+        "choices": [
+            {"content": "Oxygen", "is_correct": false},
+            {"content": "Nitrogen", "is_correct": true},
+            {"content": "Carbon dioxide", "is_correct": false}
+        ]
+    },
+    {
+        "content": "What is the tallest mountain in the world?",
+        "level": 3,
+        "choices": [
+            {"content": "K2", "is_correct": false},
+            {"content": "Mount Everest", "is_correct": true},
+            {"content": "Kilimanjaro", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Who painted the famous artwork 'The Last Supper'?",
+        "level": 3,
+        "choices": [
+            {"content": "Michelangelo", "is_correct": false},
+            {"content": "Leonardo da Vinci", "is_correct": true},
+            {"content": "Vincent van Gogh", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which gas is responsible for the greenhouse effect?",
+        "level": 3,
+        "choices": [
+            {"content": "Nitrogen", "is_correct": false},
+            {"content": "Methane", "is_correct": true},
+            {"content": "Helium", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Who is the first woman to win a Nobel Prize?",
+        "level": 3,
+        "choices": [
+            {"content": "Marie Curie", "is_correct": true},
+            {"content": "Rosa Parks", "is_correct": false},
+            {"content": "Amelia Earhart", "is_correct": false}
+        ]
+    },
+    {
+        "content": "What is the main component of the Sun?",
+        "level": 3,
+        "choices": [
+            {"content": "Hydrogen", "is_correct": true},
+            {"content": "Oxygen", "is_correct": false},
+            {"content": "Helium", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which composer wrote the famous opera 'The Magic Flute'?",
+        "level": 3,
+        "choices": [
+            {"content": "Ludwig van Beethoven", "is_correct": false},
+            {"content": "Wolfgang Amadeus Mozart", "is_correct": true},
+            {"content": "Johann Sebastian Bach", "is_correct": false}
+        ]
+    },
+    {
+        "content": "What is the chemical symbol for copper?",
+        "level": 3,
+        "choices": [
+            {"content": "Cu", "is_correct": true},
+            {"content": "Ag", "is_correct": false},
+            {"content": "Au", "is_correct": false}
+        ]
+    },
+    {
+        "content": "Which continent is known as the 'Land of Contrasts'?",
+        "level": 3,
+        "choices": [
+            {"content": "North America", "is_correct": false},
+            {"content": "Europe", "is_correct": false},
+            {"content": "Africa", "is_correct": true}
+        ]
+    }
+]
