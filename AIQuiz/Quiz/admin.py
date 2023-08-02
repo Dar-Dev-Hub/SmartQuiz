@@ -5,9 +5,27 @@ from .models import Question, Choice, QuizSubmission, QuestionSubmission
 # Register your models here.
 
 
-admin.site.register(Choice, list_display=['content', 'question', 'is_correct'])
-admin.site.register(Question, list_display=('content', 'weight', 'level')
-                    )
-admin.site.register(QuizSubmission, list_display=[
-                    'user', 'score', 'start_time', 'end_time', 'status', 'max_questions'])
-admin.site.register(QuestionSubmission, list_display=["user", "question", "is_correct", "timestamp"])
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ('content', 'level')
+    list_filter = ('level',)
+    search_fields = ('content',)
+
+@admin.register(Choice)
+class ChoiceAdmin(admin.ModelAdmin):
+    list_display = ('content', 'question', 'is_correct')
+    list_filter = ('question', 'is_correct')
+    search_fields = ('content',)
+
+@admin.register(QuizSubmission)
+class QuizSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'score', 'max_questions')
+    list_filter = ('user',)
+    search_fields = ('user__username',)
+
+@admin.register(QuestionSubmission)
+class QuestionSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('quiz_submission', 'question', 'choice', 'is_correct', 'timestamp')
+    list_filter = ('quiz_submission', 'question', 'is_correct')
+    search_fields = ('quiz_submission__user__username', 'question__content', 'choice__content')

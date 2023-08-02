@@ -7,27 +7,21 @@ class ChoiceSerializer(serializers.ModelSerializer):
         model = Choice
         fields = '__all__'
 
-
 class QuestionSerializer(serializers.ModelSerializer):
     choices = ChoiceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Question
-        fields = '__all__'
-
+        fields = ['id', 'content', 'level', 'choices']
 
 class QuestionSubmissionSerializer(serializers.ModelSerializer):
-    question = QuestionSerializer(read_only=True)
-
     class Meta:
         model = QuestionSubmission
-        fields = ['question', 'timestamp', 'is_correct']
-
+        fields = ['question', 'choice', 'is_correct', 'timestamp']
 
 class QuizSubmissionSerializer(serializers.ModelSerializer):
-    questionsubmission_set = QuestionSubmissionSerializer(
-        many=True, read_only=True)
+    questionsubmission_set = QuestionSubmissionSerializer(many=True, read_only=True)
 
     class Meta:
         model = QuizSubmission
-        fields = ['id', 'user','score' , 'questionsubmission_set']
+        fields = ['id', 'user', 'score', 'max_questions', 'questionsubmission_set']
