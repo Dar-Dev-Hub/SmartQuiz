@@ -7,7 +7,6 @@ import random
 
 # Custom manager for Question model
 
-
 class QuestionManager(models.Manager):
     def random_question_for_level(self, level):
         # Get a random question for a given level
@@ -52,6 +51,14 @@ class QuestionSubmission(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.question.content} - Correct: {self.is_correct}"
 
+    def validate(self, choice_id):
+        # Check if the choice is correct
+        choice = Choice.objects.get(id=choice_id)
+        self.choice = choice
+        self.is_correct = choice.is_correct
+        self.save()
+        return self.is_correct
+
 
 class QuizSubmission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -65,20 +72,3 @@ class QuizSubmission(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.score}"
 
-    # def generate_new_question(self):
-    #     # Get the last answered question for the user
-    #     last_question_submission = self.questionsubmission_set.order_by('-timestamp').first()
-
-    #     if last_question_submission is None or last_question_submission.is_correct:
-    #         # If there is no last question submission or the last answer was correct, get a new question for the next level
-    #         next_level = last_question_submission.question.level + 1 if last_question_submission else 1
-    #         new_question = Question.objects.random_question_for_level(next_level)
-    #     else:
-    #         # If the last answer was incorrect, repeat the same question
-    #         new_question = last_question_submission.question
-
-    #     if new_question:
-    #         QuestionSubmission.objects.create(user=self.user, question=new_question, is_correct=False)
-    #         self.questions.add(new_question)
-
-    #     return new_question

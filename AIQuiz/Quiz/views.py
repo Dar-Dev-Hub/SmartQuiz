@@ -1,46 +1,24 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+
 from .models import Question, Choice, QuestionSubmission, QuizSubmission
-from rest_framework import viewsets
-# from rest_framework import permissions
+from rest_framework import viewsets, generics
 from Quiz.serializers.user import UserSerializer, GroupSerializer
 from Quiz.serializers.quiz import  QuestionSerializer, ChoiceSerializer,QuestionSubmissionSerializer,QuizSubmissionSerializer
 from django.contrib.auth.models import User, Group
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+import random
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+
 
 
 class QuizSubmissionViewSet(viewsets.ModelViewSet):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        user = request.user  # Assuming you have authentication set up and can get the user
-        last_response = user.questionsubmission_set.last()  # Get the last response for the user
-
-        if last_response is None:
-            # If there is no previous response, return an empty list of quiz submissions
-            queryset = self.filter_queryset(self.get_queryset())
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-
-        # Get the related question based on the last response
-        last_question = last_response.question
-        # Get suggestions for the next question based on the last response
-        suggestions = Choice.objects.filter(question=last_question).exclude(pk=last_response.choice.pk)
-
-        # Serialize the suggestions for the next question
-        suggestion_serializer = ChoiceSerializer(suggestions, many=True)
-        
-        # Return the suggestions along with the list of quiz submissions
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-
-        return Response({
-            'quiz_submissions': serializer.data,
-            'suggested_choices': suggestion_serializer.data
-        })
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
@@ -56,6 +34,7 @@ class ChoiceViewSet(viewsets.ModelViewSet):
 class QuestionSubmissionViewSet(viewsets.ModelViewSet):
     queryset = QuestionSubmission.objects.all()
     serializer_class = QuestionSubmissionSerializer
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -78,3 +57,99 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+# Note : not Implemented
+class RandomQuestionView(generics.RetrieveAPIView):
+    serializer_class = QuestionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        queryset = Question.objects.filter(level=1)
+        return random.choice(queryset)
+
+
+
+
+
+
+
+# Note : not Implemented
+class UserQuestionSubmissionView(generics.CreateAPIView):
+    serializer_class = QuestionSubmissionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = self.request.user
+        quiz_submission_id = self.kwargs['quiz_submission_pk']
+        quiz_submission = QuizSubmission.objects.get(id=quiz_submission_id)
+
+        # Check if the quiz submission has reached the maximum number of questions
+        if quiz_submission.questionsubmission_set.count() >= quiz_submission.max_questions:
+            return Response({'detail': 'Quiz submission has reached the maximum number of questions.'})
+
+        # Save the question submission and update the quiz submission score
+        serializer.save(quiz_submission=quiz_submission, user=user)
+        quiz_submission.score += serializer.validated_data['is_correct']
+        quiz_submission.save()
+
+        # Get the next random question
+        next_question = random.choice(Question.objects.filter(level=quiz_submission.quiz.level))
+        next_question_serializer = QuestionSerializer(next_question)
+
+        # Prepare the response
+        data = {
+            'message': 'Question submission successful.',
+            'next_question': next_question_serializer.data
+        }
+        return Response(data)
+
+
+# Note : not Implemented
+class QuizAdvanceView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_next_question(self, user, current_question):
+        # Retrieve the QuizSubmission for the user
+        quiz_submission = QuizSubmission.objects.filter(user=user).last()
+
+        # Determine the next level of the question based on whether the last question was correct or not
+        if current_question.is_correct:
+            next_level = current_question.level + 1
+        else:
+            next_level = current_question.level - 1 if current_question.level > 1 else 1
+
+        # Get the next random question from the determined level
+        next_question = Question.objects.filter(level=next_level, is_active=True).order_by('?').first()
+
+        # If no question is found at the determined level, get a random question from any level
+        if not next_question:
+            next_question = Question.objects.filter(is_active=True).order_by('?').first()
+
+        return next_question
+
+    def get(self, request):
+        user = request.user
+
+        # Retrieve the last submitted question by the user
+        last_question_submission = QuestionSubmission.objects.filter(
+            user=user).order_by('-timestamp').first()
+
+        if last_question_submission:
+            current_question = last_question_submission.question
+        else:
+            # If no previous question submission, get a random question to start the quiz
+            current_question = Question.objects.filter(is_active=True).order_by('?').first()
+
+        # Get the next question based on the last question's correctness and user's level
+        next_question = self.get_next_question(user, current_question)
+
+        # Serialize the next question and return the response
+        next_question_serializer = QuestionSerializer(next_question)
+        return Response(next_question_serializer.data, status=status.HTTP_200_OK)
