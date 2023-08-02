@@ -1,8 +1,9 @@
 
+from rest_framework.decorators import action
 from .models import Question, Choice, QuestionSubmission, QuizSubmission
 from rest_framework import viewsets, generics
 from Quiz.serializers.user import UserSerializer, GroupSerializer
-from Quiz.serializers.quiz import  QuestionSerializer, ChoiceSerializer,QuestionSubmissionSerializer,QuizSubmissionSerializer
+from Quiz.serializers.quiz import QuestionSerializer, ChoiceSerializer, QuestionSubmissionSerializer, QuizSubmissionSerializer
 from django.contrib.auth.models import User, Group
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -10,19 +11,21 @@ import random
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes ,action
+from rest_framework.decorators import api_view, permission_classes, action
 
 
 from django.db import transaction
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def init_quiz(request):
     try:
         with transaction.atomic():
-            quiz_submission = QuizSubmission.objects.create(user=request.user, score=0)
-            question = Question.objects.filter(level=1).order_by('?').first()
-
+            quiz_submission = QuizSubmission.objects.create(
+                user=request.user, score=0)
+            question = Question.objects.filter(level=1).first()
+            print("Random question = ", question.level , question.id, question.content, question.choices.all())
             if question:
                 serializer = QuestionSerializer(question)
                 data = {
@@ -37,11 +40,6 @@ def init_quiz(request):
         return Response({'detail': 'An error occurred while initializing the quiz.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-
-
-
 class QuizSubmissionViewSet(viewsets.ModelViewSet):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
@@ -52,39 +50,39 @@ class QuizSubmissionViewSet(viewsets.ModelViewSet):
         quiz_submission = self.get_object()
         serializer = QuestionSubmissionSerializer(data=request.data)
         choice = Choice.objects.get(id=request.data['choice'])
-
         if serializer.is_valid():
             # Check if the question submission already exists in the quiz submission
             question = serializer.validated_data['question']
             if quiz_submission.questionsubmission_set.filter(question=question).exists():
                 return Response({'detail': 'Question already submitted in the quiz.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
             serializer.save(quiz_submission=quiz_submission)
             quiz_submission.score += 1 if choice.is_correct else 0
             quiz_submission.save()
-            submitted_questions_count = quiz_submission.questionsubmission_set.count()
-
+            current_question = Question.objects.get(id=question.id)
+            next_question_level = current_question.level + 1 if choice.is_correct == True else current_question.level - 1
+            
+            
+            if int(next_question_level) > 9:
+                    next_question_level = 9
+            if int(next_question_level) < 1:
+                    next_question_level = 1
             # Get the next question that has not been submitted by the user
             next_question = None
-            if submitted_questions_count < quiz_submission.max_questions:
-                last_submitted_question = quiz_submission.questionsubmission_set.last().question
-                next_question = Question.objects.filter(level=last_submitted_question.level).exclude(
-                    questionsubmission__quiz_submission=quiz_submission
+            while not next_question:
+                next_question = Question.objects.filter(level=next_question_level).exclude(
+                    id__in=quiz_submission.questionsubmission_set.values_list(
+                        'question', flat=True)
                 ).order_by('?').first()
-            else:
-                return Response({'detail': 'Quiz completed.', 'score': quiz_submission.score}, status=status.HTTP_200_OK)
 
-            if not next_question:
-                return Response({'detail': 'Quiz completed.', 'score': quiz_submission.score}, status=status.HTTP_200_OK)
+                if not next_question:
+                    # If no new question found, end the quiz
+                    return Response({'detail': 'Quiz completed.', 'score': quiz_submission.score}, status=status.HTTP_200_OK)
 
             next_question_serializer = QuestionSerializer(next_question)
             return Response({'next_question': next_question_serializer.data, 'score': quiz_submission.score}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 
 
 # class QuizSubmissionViewSet(viewsets.ModelViewSet):
@@ -99,6 +97,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+
 class ChoiceViewSet(viewsets.ModelViewSet):
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
@@ -108,10 +107,9 @@ class ChoiceViewSet(viewsets.ModelViewSet):
 # class QuestionSubmissionViewSet(viewsets.ModelViewSet):
 #     queryset = QuestionSubmission.objects.all()
 #     serializer_class = QuestionSubmissionSerializer
-    
+
 #     authentication_classes = [JWTAuthentication]
 #     permission_classes = [IsAuthenticated]
-
 
 
 # class UserViewSet(viewsets.ModelViewSet):
@@ -142,11 +140,6 @@ class ChoiceViewSet(viewsets.ModelViewSet):
 #     def get_object(self):
 #         queryset = Question.objects.filter(level=1)
 #         return random.choice(queryset)
-
-
-
-
-
 
 
 # # Note : not Implemented

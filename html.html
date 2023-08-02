@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Client</title>
+</head>
+<body>
+    <h1>Real-Time Quiz</h1>
+    <div id="question-container">
+        <!-- The question and options will be displayed here -->
+    </div>
+
+    <script>
+        // Replace 'your_student_id' with the actual student ID you want to use
+        const studentId = '1';
+        const socketUrl = `ws://${window.location.host}/ws/quiz/${studentId}/`;
+
+        const socket = new WebSocket(socketUrl);
+
+        socket.onopen = () => {
+            console.log('WebSocket connection established.');
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            // Display the question and options on the page
+            displayQuestion(data);
+        };
+
+        socket.onclose = () => {
+            console.log('WebSocket connection closed.');
+        };
+
+        function displayQuestion(questionData) {
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = `
+                <p>${questionData.question}</p>
+                <ul>
+                    <li>${questionData.possibility_1}</li>
+                    <li>${questionData.possibility_2}</li>
+                    <li>${questionData.possibility_3}</li>
+                    <li>${questionData.possibility_4}</li>
+                </ul>
+            `;
+        }
+    </script>
+</body>
+</html>

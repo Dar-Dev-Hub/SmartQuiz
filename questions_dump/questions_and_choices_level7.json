@@ -1,7 +1,7 @@
 [
     {
         "content": "What is the capital of France?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "London", "is_correct": false},
             {"content": "Paris", "is_correct": true},
@@ -10,7 +10,7 @@
     },
     {
         "content": "Which planet is closest to the Sun?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Mars", "is_correct": false},
             {"content": "Venus", "is_correct": false},
@@ -19,7 +19,7 @@
     },
     {
         "content": "What is 2 + 2?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "3", "is_correct": false},
             {"content": "4", "is_correct": true},
@@ -28,7 +28,7 @@
     },
     {
         "content": "Who wrote the play 'Romeo and Juliet'?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "William Shakespeare", "is_correct": true},
             {"content": "Jane Austen", "is_correct": false},
@@ -37,7 +37,7 @@
     },
     {
         "content": "What is the chemical symbol for water?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "H2O", "is_correct": true},
             {"content": "CO2", "is_correct": false},
@@ -46,7 +46,7 @@
     },
     {
         "content": "Which color is a mixture of red and yellow?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Blue", "is_correct": false},
             {"content": "Green", "is_correct": true},
@@ -55,7 +55,7 @@
     },
     {
         "content": "What is the tallest mammal?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Elephant", "is_correct": false},
             {"content": "Giraffe", "is_correct": true},
@@ -64,7 +64,7 @@
     },
     {
         "content": "Which continent is known as the 'Dark Continent'?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Europe", "is_correct": false},
             {"content": "Africa", "is_correct": true},
@@ -73,7 +73,7 @@
     },
     {
         "content": "Who painted the Mona Lisa?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Vincent van Gogh", "is_correct": false},
             {"content": "Leonardo da Vinci", "is_correct": true},
@@ -82,7 +82,7 @@
     },
     {
         "content": "What is the largest organ in the human body?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Heart", "is_correct": false},
             {"content": "Liver", "is_correct": true},
@@ -91,7 +91,7 @@
     },
     {
         "content": "Which animal is known as the 'King of the Jungle'?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Lion", "is_correct": true},
             {"content": "Tiger", "is_correct": false},
@@ -100,7 +100,7 @@
     },
     {
         "content": "What is the chemical symbol for gold?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Ag", "is_correct": false},
             {"content": "Au", "is_correct": true},
@@ -109,7 +109,7 @@
     },
     {
         "content": "Who is the author of the Harry Potter series?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "J.R.R. Tolkien", "is_correct": false},
             {"content": "J.K. Rowling", "is_correct": true},
@@ -118,7 +118,7 @@
     },
     {
         "content": "Which country is known as the 'Land of the Rising Sun'?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "China", "is_correct": false},
             {"content": "Japan", "is_correct": true},
@@ -127,7 +127,7 @@
     },
     {
         "content": "What is the largest ocean on Earth?",
-        "level": 2,
+        "level": 7,
         "choices": [
             {"content": "Indian Ocean", "is_correct": false},
             {"content": "Atlantic Ocean", "is_correct": false},

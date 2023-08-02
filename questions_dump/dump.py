@@ -40,17 +40,10 @@ def post_question_and_choices(jwt_token, questions_and_choices):
 def simulate_quiz():
     jwt_token = get_jwt_token()
     if jwt_token:
-        with open('questions_and_choices_level1.json') as f:
-            questions_and_choices_level1 = json.load(f)
-        post_question_and_choices(jwt_token, questions_and_choices_level1)
-
-        with open('questions_and_choices_level2.json') as f:
-            questions_and_choices_level2 = json.load(f)
-        post_question_and_choices(jwt_token, questions_and_choices_level2)
-
-        with open('questions_and_choices_level3.json') as f:
-            questions_and_choices_level3 = json.load(f)
-        post_question_and_choices(jwt_token, questions_and_choices_level3)
+        for x in range(1,11):
+            with open(f'questions_and_choices_level{x}.json') as f:
+                questions_and_choices = json.load(f)
+            post_question_and_choices(jwt_token, questions_and_choices)
 
 if __name__ == "__main__":
     simulate_quiz()

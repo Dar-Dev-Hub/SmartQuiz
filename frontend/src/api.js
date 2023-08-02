@@ -8,13 +8,22 @@ const questionData = [
       correctAnswer: '4',
     },
   ];
-  
   // fetch the next question
-  export const getNextQuestion = () => {
+  const fetchNextQuestion = async () => {
+    try {
+      const response = await fetch('"question": "http://127.0.0.1:8000/question/'); // Replace API_ENDPOINT_URL with the actual API endpoint
+      const data = await response.json();
+      console.error(data);
+      return data// Assuming the API returns the question in the "question" field
+    } catch (error) {
+      console.error('Error fetching next question:', error);
+    }
+  };
+export const getNextQuestion = () => {
     return new Promise((resolve) => {
-      // remove this in a real API implementation
+      
       setTimeout(() => {
-        resolve(questionData);
+        resolve(fetchNextQuestion);
       }, 1000); 
     });
   };
