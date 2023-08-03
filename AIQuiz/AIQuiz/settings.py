@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-*tw)9(y#c9=3x-zcy37xi@33!5!2)(rx)-w2&=n=59f&!5+h5=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -59,7 +60,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

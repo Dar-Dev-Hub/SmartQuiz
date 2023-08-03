@@ -3,13 +3,10 @@ import axios from 'axios';
 import QuestionDisplay from './QuestionDisplay';
 import AnswerSubmission from './AnswerSubmission';
 import { CircularProgress, Typography, Button, LinearProgress, BottomNavigationAction, BottomNavigation } from '@mui/material';
-import {  PersonOffOutlined, QuizRounded,  } from '@mui/icons-material';
+import { ArrowBackRounded, Margin, Padding, Person2, PersonOffOutlined, QuestionAnswerRounded, QuizRounded, Timer10 } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
-
 
 const QuizPage = ({ jwtToken, onLogout }) => {
   const [quizStarted, setQuizStarted] = useState(false);
@@ -18,10 +15,11 @@ const QuizPage = ({ jwtToken, onLogout }) => {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [questionsSubmitted, setQuestionsSubmitted] = useState(0);
   const [score, setScore] = useState(0);
-  const totalQuestions = 20; // Change this number to the total number of questions in the quiz
+  const totalQuestions = 20;
   const [UserLevel, setUserLevel] = useState(1);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
+
   useEffect(() => {
     // Function to start the quiz and fetch the first question
     const startQuiz = async () => {
@@ -29,8 +27,12 @@ const QuizPage = ({ jwtToken, onLogout }) => {
         const response = await axios.post(
           'http://localhost:8000/api/init-quiz/',
           {},
-          { headers: { Authorization: `Bearer ${jwtToken}` } } // Include the JWT token in the headers
+          { headers: { Authorization: `Bearer ${jwtToken}` } }
         );
+
+        // Save the last question ID and quiz submission ID to local storage
+        localStorage.setItem('lastQuestionId', response.data.question.id);
+        localStorage.setItem('quizSubmissionId', response.data.quiz_submission_id);
 
         // Update state with the quiz submission ID and first question data
         setQuizSubmissionId(response.data.quiz_submission_id);
@@ -43,13 +45,42 @@ const QuizPage = ({ jwtToken, onLogout }) => {
       }
     };
 
-    // Start the quiz when the JWT token is available
-    if (jwtToken) {
+    // Check if the last question ID and quiz submission ID are available in local storage
+    const lastQuestionId = localStorage.getItem('lastQuestionId');
+    const quizSubmissionId = localStorage.getItem('quizSubmissionId');
+
+    // Function to fetch the question data from the server using the last question ID
+    const fetchQuestionData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/questions/${lastQuestionId}/`,
+          { headers: { Authorization: `Bearer ${jwtToken}` } }
+        );
+
+        setQuestionData(response.data);
+
+        // After fetching the question data, set the quiz submission ID and start the quiz
+        setQuizSubmissionId(quizSubmissionId);
+        setQuizStarted(true);
+      } catch (error) {
+        console.log('Failed to fetch question data:', error);
+      }
+    };
+
+    // If the last question ID and quiz submission ID are available, fetch the question data
+    if (lastQuestionId && quizSubmissionId) {
+      console.log('Resuming the quiz...');
+      console.log('Last question ID:', lastQuestionId);
+      fetchQuestionData();
+    } else {
+      // If the last question ID and quiz submission ID are not available, start the quiz as usual
+      console.log('Starting the quiz...');
       startQuiz();
       setStartTime(Date.now());
-
     }
   }, [jwtToken]);
+
+
   useEffect(() => {
     const interval = setInterval(() => {
       const currentTime = Date.now();
@@ -58,6 +89,7 @@ const QuizPage = ({ jwtToken, onLogout }) => {
 
     return () => clearInterval(interval);
   }, [startTime]);
+
   const formatElapsedTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -65,35 +97,49 @@ const QuizPage = ({ jwtToken, onLogout }) => {
 
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
-  // Function to handle the submission of user answers
+
   const handleAnswerSubmission = async (questionId, choiceId, isCorrect) => {
     try {
       const response = await axios.post(
         `http://localhost:8000/api/quiz-submissions/${quizSubmissionId}/submit/`,
         { question: questionId, choice: choiceId, is_correct: isCorrect },
-        { headers: { Authorization: `Bearer ${jwtToken}` } } // Include the JWT token in the headers
+        { headers: { Authorization: `Bearer ${jwtToken}` } }
       );
+      console.log('Answer submitted:', response.data);
       setScore(response.data.score);
-      setUserLevel(response.data.next_question.level - 1);
-      if (response.data.next_question) {
-        // If there is a next question, update state with the new question data
-        setQuestionData(response.data.next_question);
-        setQuestionsSubmitted((prev) => prev + 1); // Increment the number of questions submitted
-        const msg = isCorrect ? ' ✔️ Correct answer!' : ' ❌ Wrong answer!';
-        toast(msg, {
-          position: "top-left",
-          autoClose: 5,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      } else {
-        // If there is no next question, the quiz is completed
+      if (response.data.detail == "Quiz completed.") {
         setIsQuizCompleted(true);
+        console.log('Quiz completed');
+        setUserLevel(questionData.level);
+
+        setQuestionsSubmitted(20)
+
       }
+      else {
+
+        if (response.data.next_question) {
+          setUserLevel(response.data.next_question.level - 1);
+
+          // If there is a next question, update state with the new question data
+          setQuestionData(response.data.next_question);
+          setQuestionsSubmitted((prev) => prev + 1); // Increment the number of questions submitted
+          const msg = isCorrect ? ' ✔️ Correct answer!' : ' ❌ Wrong answer!';
+          toast(msg, {
+            position: "top-left",
+            autoClose: 5,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          // If there is no next question, the quiz is completed
+          setIsQuizCompleted(true);
+        }
+      }
+
     } catch (error) {
       console.log('Failed to submit answer:', error);
     }
@@ -124,7 +170,6 @@ const QuizPage = ({ jwtToken, onLogout }) => {
               </Typography>
               <Typography variant="h5" gutterBottom>
                 According to this assessment, you should take the Mastery Course Level {UserLevel}
-
               </Typography>
               <Typography variant="h5" gutterBottom>
                 You took {formatElapsedTime(elapsedTime)} to complete the quiz.
@@ -146,7 +191,6 @@ const QuizPage = ({ jwtToken, onLogout }) => {
                 Time Elapsed: {formatElapsedTime(elapsedTime)}
               </Typography>
             </div>
-
           )}
           <BottomNavigation
             sx={{
@@ -157,7 +201,8 @@ const QuizPage = ({ jwtToken, onLogout }) => {
               backgroundColor: '#f0f0f0',
               padding: '10px',
             }}
-            showLabels>
+            showLabels
+          >
             <BottomNavigationAction
               component={"a"}
               href={`http://localhost:8000/api/quiz-submissions/${quizSubmissionId}`}
@@ -165,16 +210,10 @@ const QuizPage = ({ jwtToken, onLogout }) => {
               label={`Quiz ID - ${quizSubmissionId}`}
               icon={<QuizRounded />}
             />
-            {/* <BottomNavigationAction
-              component={"a"}
-              href={`http://localhost:8000/api/quiz/${quizSubmissionId}`}
-              label="Profile" icon={<Person2 />} /> */}
             <BottomNavigationAction label="Logout" icon={<PersonOffOutlined />} onClick={onLogout} />
           </BottomNavigation>
           <ToastContainer />
-
         </div>
-
       ) : (
         <CircularProgress />
       )}

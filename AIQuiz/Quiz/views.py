@@ -43,7 +43,7 @@ def init_quiz(request):
 class QuizSubmissionViewSet(viewsets.ModelViewSet):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['post'])
     def submit(self, request, pk=None):
@@ -54,11 +54,13 @@ class QuizSubmissionViewSet(viewsets.ModelViewSet):
             # Check if the question submission already exists in the quiz submission
             question = serializer.validated_data['question']
             if quiz_submission.questionsubmission_set.filter(question=question).exists():
-                return Response({'detail': 'Question already submitted in the quiz.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            serializer.save(quiz_submission=quiz_submission)
-            quiz_submission.score += 1 if choice.is_correct else 0
-            quiz_submission.save()
+                if quiz_submission.questionsubmission_set.count() >=  quiz_submission.max_questions:
+                    return Response({'detail': 'Quiz completed.', 'score': quiz_submission.score}, status=status.HTTP_200_OK)
+                
+            else:
+                serializer.save(quiz_submission=quiz_submission)
+                quiz_submission.score += 1 if choice.is_correct else 0
+                quiz_submission.save()
             current_question = Question.objects.get(id=question.id)
             next_question_level = current_question.level + 1 if choice.is_correct == True else current_question.level - 1
             

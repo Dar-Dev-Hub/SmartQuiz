@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Login from './components/Login';
 import QuizPage from './components/QuizPage';
-
+import QuizPageNoRefresh from './components/QuizPageNoRefresh';
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [jwtToken, setJwtToken] = useState('');
@@ -37,6 +37,9 @@ const App = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem("quizSubmissionId");
+    localStorage.removeItem("lastQuestionId");
+    
     setIsLoggedIn(false);
     setJwtToken('');
   };
@@ -44,7 +47,7 @@ const App = () => {
   return (
     <div>
       {isLoggedIn ? (
-        <QuizPage jwtToken={jwtToken} onLogout={handleLogout} />
+        <QuizPageNoRefresh jwtToken={jwtToken} onLogout={handleLogout} />
       ) : (
         <Login onLogin={handleLogin} />
       )}

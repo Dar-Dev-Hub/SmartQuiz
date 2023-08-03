@@ -20,7 +20,7 @@ class ChoiceAdmin(admin.ModelAdmin):
 
 @admin.register(QuizSubmission)
 class QuizSubmissionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'score', 'max_questions')
+    list_display = ('user', 'score', 'max_questions',)
     list_filter = ('user',)
     search_fields = ('user__username',)
 
@@ -28,4 +28,4 @@ class QuizSubmissionAdmin(admin.ModelAdmin):
 class QuestionSubmissionAdmin(admin.ModelAdmin):
     list_display = ('quiz_submission', 'question', 'choice', 'is_correct', 'timestamp')
     list_filter = ('quiz_submission', 'question', 'is_correct')
-    search_fields = ('quiz_submission__user__username', 'question__content', 'choice__content')
+    search_fields = ('quiz_submission__user__username', 'question__content', 'choice__content',"question__level")
